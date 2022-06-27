@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Condiment;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Portion;
@@ -75,7 +77,7 @@ public class FoodDao {
 	}
 	
 	public List<Portion> listAllPortions(){
-		String sql = "SELECT * FROM portion" ;
+		String sql = "SELECT * FROM `portion`" ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
 
@@ -109,6 +111,56 @@ public class FoodDao {
 
 	}
 	
+	public List<String> getVertici(Double C) {
+		String sql="SELECT DISTINCT portion_display_name "
+				+ "FROM `portion` "
+				+ "WHERE calories<?";
+		List<String> result = new ArrayList<String>();
+		Connection conn = DBConnect.getConnection();
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDouble(1, C);
+			ResultSet res = st.executeQuery();
+			while(res.next()) {
+				result.add(res.getString("portion_display_name"));
+			}
+			conn.close();
+			return result;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
+	public List<Adiacenza> getAdiacenze(Double C) {
+		String sql="SELECT p1.portion_display_name, p2.portion_display_name, COUNT(DISTINCT f.food_code) "
+				+ "FROM food f, `portion` p1, `portion` p2 "
+				+ "WHERE f.food_code = p1.food_code AND f.food_code = p2.food_code "
+				+ "AND p1.portion_display_name < p2.portion_display_name "
+				+ "AND p1.calories < ? AND p2.calories < ? "
+				+ "GROUP BY p1.portion_display_name, p2.portion_display_name";
+		List<Adiacenza> result = new ArrayList<Adiacenza>();
+		Connection conn = DBConnect.getConnection();
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDouble(1, C);
+			st.setDouble(2, C);
+			ResultSet res = st.executeQuery();
+			
+			while(res.next()) {
+				result.add(new Adiacenza(res.getString("p1.portion_display_name"), res.getString("p2.portion_display_name"), res.getInt("COUNT(DISTINCT f.food_code)")));
+			}
+			
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
 
 }

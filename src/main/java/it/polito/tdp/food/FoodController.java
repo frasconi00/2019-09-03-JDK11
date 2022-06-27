@@ -5,7 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,7 +43,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -54,14 +57,36 @@ public class FoodController {
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
+    	String tipo1 = boxPorzioni.getValue();
+    	if(tipo1==null) {
+    		txtResult.appendText("Errore-scegliere tipo di porzione dalla tendina");
+    		return;
+    	}
+    	List<Adiacenza> vicini = model.doCorrelate(tipo1);
+    	txtResult.appendText("Tipi di porzione correlati a "+tipo1+":");
+    	for(Adiacenza a : vicini) {
+    		txtResult.appendText("\n"+a.getTipo2()+" "+a.getPeso());
+    	}
     	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	
+    	try {
+    		Double calorie = Double.parseDouble(txtCalorie.getText());
+    		model.creaGrafo(calorie);
+    		txtResult.appendText("Grafo creato");
+    		txtResult.appendText("\n#vertici: "+model.nVertici());
+    		txtResult.appendText("\n#archi: "+model.nArchi());
+    	}catch(NumberFormatException e) {
+    		txtResult.appendText("Errore-inserire un numero per le calorie");
+    		return;
+    	}
+    	
+    	boxPorzioni.getItems().clear();
+    	boxPorzioni.getItems().addAll(model.getVertici());
     	
     }
 
