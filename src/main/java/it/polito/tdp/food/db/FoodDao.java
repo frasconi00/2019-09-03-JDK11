@@ -134,9 +134,9 @@ public class FoodDao {
 	}
 	
 	public List<Adiacenza> getAdiacenze(Double C) {
-		String sql="SELECT p1.portion_display_name, p2.portion_display_name, COUNT(DISTINCT f.food_code) "
-				+ "FROM food f, `portion` p1, `portion` p2 "
-				+ "WHERE f.food_code = p1.food_code AND f.food_code = p2.food_code "
+		String sql="SELECT p1.portion_display_name, p2.portion_display_name, COUNT(DISTINCT p1.food_code) "
+				+ "FROM `portion` p1, `portion` p2 "
+				+ "WHERE p1.food_code = p2.food_code "
 				+ "AND p1.portion_display_name < p2.portion_display_name "
 				+ "AND p1.calories < ? AND p2.calories < ? "
 				+ "GROUP BY p1.portion_display_name, p2.portion_display_name";
@@ -149,7 +149,7 @@ public class FoodDao {
 			ResultSet res = st.executeQuery();
 			
 			while(res.next()) {
-				result.add(new Adiacenza(res.getString("p1.portion_display_name"), res.getString("p2.portion_display_name"), res.getInt("COUNT(DISTINCT f.food_code)")));
+				result.add(new Adiacenza(res.getString("p1.portion_display_name"), res.getString("p2.portion_display_name"), res.getInt("COUNT(DISTINCT p1.food_code)")));
 			}
 			
 			conn.close();

@@ -26,13 +26,18 @@ public class Model {
 		
 		Graphs.addAllVertices(grafo, dao.getVertici(C));
 		
+		System.out.println("vertici: "+grafo.vertexSet().size());
+		
 		for(Adiacenza a : dao.getAdiacenze(C)) {
 			Graphs.addEdgeWithVertices(grafo, a.getTipo1(), a.getTipo2(), a.getPeso());
 		}
 		
+		System.out.println("archi: "+grafo.edgeSet().size());
+		
 	}
 	
 	public int nVertici() {
+		System.out.println("metodo nVertici:"+this.grafo.vertexSet().size());
 		return this.grafo.vertexSet().size();
 	}
 	
@@ -61,7 +66,7 @@ public class Model {
 	public List<String> getVertici() {
 		List<String> vertici = new ArrayList<String>(grafo.vertexSet());
 		
-		Collections.sort(vertici);
+//		Collections.sort(vertici);
 		
 		return vertici;
 	}
